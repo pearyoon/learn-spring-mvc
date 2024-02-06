@@ -2,7 +2,6 @@ package hello.servlet.web.frontcontroller.v5;
 
 import hello.servlet.web.frontcontroller.ModelView;
 import hello.servlet.web.frontcontroller.MyView;
-import hello.servlet.web.frontcontroller.v3.ControllerV3;
 import hello.servlet.web.frontcontroller.v3.controller.MemberFormControllerV3;
 import hello.servlet.web.frontcontroller.v3.controller.MemberListControllerV3;
 import hello.servlet.web.frontcontroller.v3.controller.MemberSaveControllerV3;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.taglibs.standard.lang.jstl.ImplicitObjects.createParamMap;
 
 @WebServlet(name = "frontControllerServletV5", urlPatterns = "/front-controller/v5/*")
 public class FrontControllerServletV5 extends HttpServlet {
@@ -53,17 +51,18 @@ public class FrontControllerServletV5 extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 핸들러 조회
         Object handler = getHandler(request);
         if(handler == null){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
+        // 핸들러 어댑터 조회
         MyHandlerAdapter adapter = getHandlerAdapter(handler);
-
+        // 핸들러 어댑터 -> 핸들러(컨트롤러) -> 핸들러 어댑터 -> ModelView 반환
         ModelView mv = adapter.handle(request, response, handler);
-
         String viewName = mv.getViewName();
+        // 뷰 리졸버
         MyView view = viewResolver(viewName);
 
         view.render(mv.getModel(), request, response);
